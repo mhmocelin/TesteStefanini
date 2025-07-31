@@ -33,7 +33,7 @@ const PersonList: React.FC<PersonListProps> = ({ onEdit }) => {
             <TableCell>Email</TableCell>
             <TableCell>CPF</TableCell>
             <TableCell>Data de Nascimento</TableCell>
-            <TableCell>#</TableCell>
+            <TableCell align="center">#</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -45,7 +45,7 @@ const PersonList: React.FC<PersonListProps> = ({ onEdit }) => {
               <TableCell>{new Date(p.birthDate).toLocaleDateString()}</TableCell>
               <TableCell>
                 <Button variant="outlined" color="primary" onClick={() => onEdit(p)}>
-                  Edit
+                  Editar
                 </Button>
                 <Button
                   variant="outlined"
@@ -53,7 +53,7 @@ const PersonList: React.FC<PersonListProps> = ({ onEdit }) => {
                   onClick={() => handleDelete(p.id)}
                   style={{ marginLeft: 8 }}
                 >
-                  Delete
+                  Deletar
                 </Button>
               </TableCell>
             </TableRow>

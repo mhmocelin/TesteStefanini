@@ -7,11 +7,11 @@ const API_URL = '/api/v1/persons';
 
 export const getPersons = async (): Promise<Person[]> => {
   try {
-    const response = await axios.get<Person[] | null>(API_URL);
-    return response.data ?? [];
+    const response = await axios.get<{ success: boolean; data: Person[] }>(API_URL);
+    return response.data.data ?? [];
   } catch (error) {
     console.error('Erro ao buscar pessoas:', error);
-    return []; // Evita quebra na tela
+    return [];
   }
 };
 

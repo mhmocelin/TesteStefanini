@@ -40,9 +40,19 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ApiResponseFilter>();
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy => policy
+            .WithOrigins("http://localhost:3000") // origem do React
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
 
 var app = builder.Build();
 
+app.UseCors("AllowReact");
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.

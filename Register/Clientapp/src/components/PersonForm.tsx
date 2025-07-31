@@ -132,7 +132,7 @@ const PersonForm: React.FC<PersonFormProps> = ({ selectedPerson, onSaved }) => {
         />
         <TextField
           fullWidth
-          label="Nationality"
+          label="Nacionalidade"
           name="nationality"
           value={formik.values.nationality}
           onChange={formik.handleChange}

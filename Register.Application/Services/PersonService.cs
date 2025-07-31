@@ -5,7 +5,6 @@ using Register.Application.Exceptions;
 using Register.Application.Interfaces;
 using Register.Domain.Entities;
 using Register.Infrastructure.Data;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace Register.Application.Services;
 
