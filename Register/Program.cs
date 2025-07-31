@@ -1,39 +1,37 @@
-using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Register.Api.Configurations;
 using Register.Api.Controllers;
-using Register.Application.Commands.Persons;
-using Register.Application.Dispatcher;
-using Register.Application.Dispatcher.Interfaces;
-using Register.Application.DTOs;
-using Register.Application.Handlers.Persons;
-using Register.Application.Interfaces;
-using Register.Application.Queries.Persons;
-using Register.Application.Services;
-using Register.Application.Validators.Persons;
 using Register.Infrastructure.Data;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
 builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseInMemoryDatabase("PersonsDb"));
 
-builder.Services.AddScoped<IPersonService, PersonService>();
-builder.Services.AddScoped<IApplicationDispatcher, ApplicationDispatcher>();
-builder.Services.AddScoped<IRequestHandler<CreatePersonCommand, PersonResponse>, CreatePersonHandler>();
-builder.Services.AddScoped<IRequestHandler<DeletePersonCommand, bool>, DeletePersonHandler>();
-builder.Services.AddScoped<IRequestHandler<GetAllPersonsQuery, IEnumerable<PersonResponse>>, GetAllPersonsHandler>();
-builder.Services.AddScoped<IRequestHandler<GetPersonByIdQuery, PersonResponse>, GetPersonByIdHandler>();
-builder.Services.AddScoped<IRequestHandler<UpdatePersonCommand, PersonResponse>, UpdatePersonHandler>();
-
-builder.Services.AddScoped<IValidator<PersonCreate>, CreatePersonValidator>();
-builder.Services.AddScoped<IValidator<PersonUpdate>, UpdatePersonValidator>();
+builder.Services.AddApplicationServices();
 
 builder.Services.AddControllers(options =>
 {
@@ -44,7 +42,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact",
         policy => policy
-            .WithOrigins("http://localhost:3000") // origem do React
+            .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -55,12 +53,16 @@ var app = builder.Build();
 app.UseCors("AllowReact");
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    foreach (var description in provider.ApiVersionDescriptions)
+    {
+        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+    }
+});
 
 app.UseHttpsRedirection();
 
@@ -72,7 +74,5 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapFallbackToFile("index.html");
-
-app.MapControllers();
 
 app.Run();

@@ -12,6 +12,7 @@ public class Person
     public string CPF { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public Address? Address { get; set; }
 
     protected Person() { }
     public Person(string name, string cpf, DateTime birthDate,
@@ -55,5 +56,11 @@ public class Person
         PlaceOfBirth = placeOfBirth;
         Nationality = nationality;
         UpdatedAt = DateTime.UtcNow;
+    }
+
+
+    public void SetAddress(Address address)
+    {
+        Address = address;
     }
 }
