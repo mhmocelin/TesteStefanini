@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Person } from '../types/Person';
-import { getPersons, deletePerson } from '../api/personApi';
+import { getPersons, deletePerson } from '../services/personService';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 interface PersonListProps {

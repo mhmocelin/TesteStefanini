@@ -5,7 +5,7 @@ import { TextField, Button, Paper } from '@mui/material';
 import { CreatePerson } from '../types/CreatePerson';
 import { UpdatePerson } from '../types/UpdatePerson';
 import { Person } from '../types/Person';
-import { createPerson, updatePerson } from '../api/personApi';
+import { createPerson, updatePerson } from '../services/personService';
 
 interface PersonFormProps {
   selectedPerson?: Person;

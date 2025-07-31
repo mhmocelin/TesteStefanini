@@ -1,7 +1,11 @@
 import React from 'react';
-import HomePage from './pages/HomePage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 const theme = createTheme();
 
@@ -9,7 +13,21 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <HomePage />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 };

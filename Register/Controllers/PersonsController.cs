@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Register.Application.Commands.Persons;
-using Register.Application.DTOs;
 using Register.Application.Dispatcher.Interfaces;
+using Register.Application.DTOs;
 using Register.Application.Queries.Persons;
 
 namespace Register.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 

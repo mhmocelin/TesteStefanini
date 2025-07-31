@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Register.Application.Commands.Persons.V2;
 using Register.Application.Dispatcher.Interfaces;
 using Register.Application.DTOs.V2;
@@ -7,6 +8,7 @@ using Register.Application.Queries.Persons.V2;
 namespace Register.Api.Controllers.V2;
 
 [ApiController]
+[Authorize]
 [ApiVersion("2.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class PersonsController : ControllerBase

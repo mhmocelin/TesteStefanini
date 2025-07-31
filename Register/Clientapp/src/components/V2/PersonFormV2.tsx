@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { TextField, Button, Paper } from '@mui/material';
 import { CreatePersonV2 } from '../../types/V2/CreatePersonV2';
 import { PersonV2 } from '../../types/V2/PersonV2';
-import { createPersonV2, updatePersonV2 } from '../../api/V2/personsV2Api';
+import { createPersonV2, updatePersonV2 } from '../../services/personServiceV2';
 
 interface PersonFormV2Props {
   selectedPerson?: PersonV2;

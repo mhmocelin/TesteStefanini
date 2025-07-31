@@ -1,5 +1,6 @@
-﻿using System.Net;
-using FluentValidation;
+﻿using FluentValidation;
+using System.Net;
+using System.Reflection;
 
 namespace Register.Api.Controllers;
 
@@ -20,29 +21,37 @@ public class ErrorHandlingMiddleware
         }
         catch (ValidationException ex)
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-            var response = new
-            {
-                success = false,
-                errors = ex.Errors.Select(e => e.ErrorMessage).ToArray()
-            };
-
-            await context.Response.WriteAsJsonAsync(response);
+            await WriteErrorResponse(context, HttpStatusCode.BadRequest, ex.Errors.Select(e => e.ErrorMessage));
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            await WriteErrorResponse(context, HttpStatusCode.Unauthorized, new[] { ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            await WriteErrorResponse(context, HttpStatusCode.NotFound, new[] { ex.Message });
         }
         catch (Exception ex)
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            var realException = ex is TargetInvocationException && ex.InnerException != null
+                ? ex.InnerException
+                : ex;
 
-            var response = new
-            {
-                success = false,
-                errors = new[] { ex.Message }
-            };
-
-            await context.Response.WriteAsJsonAsync(response);
+            await WriteErrorResponse(context, HttpStatusCode.InternalServerError, new[] { realException.Message });
         }
+    }
+
+    private static async Task WriteErrorResponse(HttpContext context, HttpStatusCode statusCode, IEnumerable<string> errors)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)statusCode;
+
+        var response = new
+        {
+            success = false,
+            errors = errors.ToArray()
+        };
+
+        await context.Response.WriteAsJsonAsync(response);
     }
 }

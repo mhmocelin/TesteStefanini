@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PersonV2 } from '../../types/V2/PersonV2';
-import { getPersonsV2, deletePersonV2 } from '../../api/V2/personsV2Api';
+import { getPersonsV2, deletePersonV2 } from '../../services/personServiceV2';
 import {
   Button,
   Table,
