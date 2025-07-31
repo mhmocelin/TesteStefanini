@@ -1,27 +1,39 @@
-﻿using Register.Application.DTOs;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Register.Application.DTOs;
+using Register.Application.Exceptions;
 using Register.Application.Interfaces;
 using Register.Domain.Entities;
 using Register.Infrastructure.Data;
-using System.Data.Entity;
-using System.Text.RegularExpressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace Register.Application.Services;
 
 public class PersonService : IPersonService
 {
     private readonly AppDbContext _context;
+    private readonly IValidator<PersonCreate> _createValidator;
+    private readonly IValidator<PersonUpdate> _updateValidator;
 
-    public PersonService(AppDbContext context)
+    public PersonService(
+        AppDbContext context,
+        IValidator<PersonCreate> createValidator,
+        IValidator<PersonUpdate> updateValidator)
     {
         _context = context;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
     }
 
     public async Task<PersonResponse> CreateAsync(PersonCreate personDto)
     {
-        ValidateCpf(personDto.CPF);
-        ValidateEmail(personDto.Email);
-        ValidateBirthDate(personDto.BirthDate);
+        var validation = await _createValidator.ValidateAsync(personDto);
 
+        if (!validation.IsValid)
+        {
+            var error = validation.Errors.First();
+            throw new BusinessException(error.ErrorMessage, error.ErrorCode);
+        }
         var exists = await _context.Persons.AnyAsync(p => p.CPF == personDto.CPF);
         if (exists)
             throw new InvalidOperationException("CPF already exists.");
@@ -36,7 +48,7 @@ public class PersonService : IPersonService
             personDto.Nationality
         );
 
-        _context.Persons.Add(person);
+        await _context.Persons.AddAsync(person);
         await _context.SaveChangesAsync();
 
         return MapToResponse(person);
@@ -44,12 +56,17 @@ public class PersonService : IPersonService
 
     public async Task<PersonResponse?> UpdateAsync(Guid id, PersonUpdate personDto)
     {
+        var validation = await _updateValidator.ValidateAsync(personDto);
+
+        if (!validation.IsValid)
+        {
+            var error = validation.Errors.First();
+            throw new BusinessException(error.ErrorMessage, error.ErrorCode);
+        }
+
         var person = await _context.Persons.FindAsync(id);
         if (person == null)
             return null;
-
-        ValidateEmail(personDto.Email);
-        ValidateBirthDate(personDto.BirthDate);
 
         person.Update(
             personDto.Name,
@@ -61,7 +78,6 @@ public class PersonService : IPersonService
         );
 
         await _context.SaveChangesAsync();
-
         return MapToResponse(person);
     }
 
@@ -89,26 +105,5 @@ public class PersonService : IPersonService
     }
 
     private static PersonResponse MapToResponse(Person person)
-    {
-        return PersonResponse.FromEntity(person);
-    }
-
-    private static void ValidateCpf(string cpf)
-    {
-        if (string.IsNullOrWhiteSpace(cpf) || !Regex.IsMatch(cpf, @"^\d{11}$"))
-            throw new ArgumentException("Invalid CPF format.");
-    }
-
-    private static void ValidateEmail(string? email)
-    {
-        if (!string.IsNullOrEmpty(email) &&
-            !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            throw new ArgumentException("Invalid email format.");
-    }
-
-    private static void ValidateBirthDate(DateTime birthDate)
-    {
-        if (birthDate > DateTime.UtcNow)
-            throw new ArgumentException("Birth date cannot be in the future.");
-    }
+        => PersonResponse.FromEntity(person);
 }

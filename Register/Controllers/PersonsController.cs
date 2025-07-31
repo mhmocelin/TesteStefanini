@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Register.Application.Commands.Persons;
-using Register.Application.Dispatcher;
 using Register.Application.DTOs;
+using Register.Application.Dispatcher.Interfaces;
 using Register.Application.Queries.Persons;
 
 namespace Register.Api.Controllers;
@@ -18,51 +18,30 @@ public class PersonsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PersonResponse>>> GetAll()
-    {
-        var query = new GetAllPersonsQuery();
-        var persons = await _dispatcher.SendQueryAsync(query);
-        return Ok(persons);
-    }
+    [ProducesResponseType(typeof(IEnumerable<PersonResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll()
+        => Ok(await _dispatcher.Send(new GetAllPersonsQuery()));
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<PersonResponse>> GetById(Guid id)
-    {
-        var query = new GetPersonByIdQuery(id);
-        var person = await _dispatcher.SendQueryAsync(query);
-        if (person == null)
-            return NotFound();
-
-        return Ok(person);
-    }
+    [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(Guid id)
+        => Ok(await _dispatcher.Send(new GetPersonByIdQuery(id)));
 
     [HttpPost]
-    public async Task<ActionResult<PersonResponse>> Create([FromBody] PersonCreate dto)
-    {
-        var command = new CreatePersonCommand(dto);
-        var person = await _dispatcher.SendCommandAsync(command);
-        return CreatedAtAction(nameof(GetById), new { id = person.Id }, person);
-    }
+    [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] PersonCreate dto)
+        => Ok(await _dispatcher.Send(new CreatePersonCommand(dto)));
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<PersonResponse>> Update(Guid id, [FromBody] PersonUpdate dto)
-    {
-        var command = new UpdatePersonCommand(id, dto);
-        var person = await _dispatcher.SendCommandAsync(command);
-        if (person == null)
-            return NotFound();
-
-        return Ok(person);
-    }
+    [ProducesResponseType(typeof(PersonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] PersonUpdate dto)
+        => Ok(await _dispatcher.Send(new UpdatePersonCommand(id, dto)));
 
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> Delete(Guid id)
-    {
-        var command = new DeletePersonCommand(id);
-        var deleted = await _dispatcher.SendCommandAsync(command);
-        if (!deleted)
-            return NotFound();
-
-        return NoContent();
-    }
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(Guid id)
+        => Ok(await _dispatcher.Send(new DeletePersonCommand(id)));
 }

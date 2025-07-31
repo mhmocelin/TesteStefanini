@@ -1,8 +1,9 @@
-﻿using static Register.Application.Dispatcher.ICommand;
+﻿using Register.Application.Dispatcher;
+using Register.Application.Dispatcher.Interfaces;
 
 namespace Register.Application.Commands.Persons;
 
-public class DeletePersonCommand : ICommand<bool>
+public class DeletePersonCommand : IRequest<bool>
 {
     public Guid Id { get; }
 

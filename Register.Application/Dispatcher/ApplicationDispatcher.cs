@@ -1,29 +1,27 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using static Register.Application.Dispatcher.ICommand;
-using static Register.Application.Dispatcher.IQuery;
+﻿using Register.Application.Dispatcher.Interfaces;
 
 namespace Register.Application.Dispatcher;
 
 public class ApplicationDispatcher : IApplicationDispatcher
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _provider;
 
-    public ApplicationDispatcher(IServiceProvider serviceProvider)
+    public ApplicationDispatcher(IServiceProvider provider)
     {
-        _serviceProvider = serviceProvider;
+        _provider = provider;
     }
 
-    public async Task<TResult> SendCommandAsync<TResult>(ICommand<TResult> command)
+    public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request)
     {
-        var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
-        var handler = _serviceProvider.GetRequiredService(handlerType);
-        return await ((ICommandHandler<ICommand<TResult>, TResult>)handler).HandleAsync(command);
-    }
+        var handlerType = typeof(IRequestHandler<,>).MakeGenericType(request.GetType(), typeof(TResponse));
+        var handler = _provider.GetService(handlerType);
 
-    public async Task<TResult> SendQueryAsync<TResult>(IQuery<TResult> query)
-    {
-        var handlerType = typeof(IQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
-        var handler = _serviceProvider.GetRequiredService(handlerType);
-        return await ((IQueryHandler<IQuery<TResult>, TResult>)handler).HandleAsync(query);
+        if (handler == null)
+            throw new InvalidOperationException($"Handler não encontrado para {request.GetType().Name}");
+
+        var method = handlerType.GetMethod("Handle");
+        var task = (Task<TResponse>)method!.Invoke(handler, new object[] { request })!;
+
+        return await task;
     }
 }

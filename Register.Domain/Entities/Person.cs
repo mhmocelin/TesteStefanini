@@ -13,6 +13,7 @@ public class Person
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
+    protected Person() { }
     public Person(string name, string cpf, DateTime birthDate,
                   string? gender = null, string? email = null,
                   string? placeOfBirth = null, string? nationality = null)

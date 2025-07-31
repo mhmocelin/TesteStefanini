@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Register.Application.DTOs;
-using System.Text.RegularExpressions;
 
 namespace Register.Application.Validators.Persons;
 

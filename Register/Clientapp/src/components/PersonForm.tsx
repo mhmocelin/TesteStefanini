@@ -141,7 +141,7 @@ const PersonForm: React.FC<PersonFormProps> = ({ selectedPerson, onSaved }) => {
         {!isEdit && (
           <TextField
             fullWidth
-            label="Nacionalidade"
+            label="CPF"
             name="cpf"
             value={formik.values.cpf}
             onChange={formik.handleChange}

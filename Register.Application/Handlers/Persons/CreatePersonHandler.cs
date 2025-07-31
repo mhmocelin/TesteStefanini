@@ -1,11 +1,11 @@
 ﻿using Register.Application.Commands.Persons;
-using Register.Application.Dispatcher;
+using Register.Application.Dispatcher.Interfaces;
 using Register.Application.DTOs;
 using Register.Application.Interfaces;
 
 namespace Register.Application.Handlers.Persons;
 
-public class CreatePersonHandler : ICommandHandler<CreatePersonCommand, PersonResponse>
+public class CreatePersonHandler : IRequestHandler<CreatePersonCommand, PersonResponse>
 {
     private readonly IPersonService _service;
 
@@ -14,7 +14,7 @@ public class CreatePersonHandler : ICommandHandler<CreatePersonCommand, PersonRe
         _service = service;
     }
 
-    public async Task<PersonResponse> HandleAsync(CreatePersonCommand command)
+    public async Task<PersonResponse> Handle(CreatePersonCommand command)
     {
         return await _service.CreateAsync(command.Person);
     }

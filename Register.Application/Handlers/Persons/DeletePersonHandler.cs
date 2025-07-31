@@ -1,10 +1,10 @@
 ﻿using Register.Application.Commands.Persons;
-using Register.Application.Dispatcher;
+using Register.Application.Dispatcher.Interfaces;
 using Register.Application.Interfaces;
 
 namespace Register.Application.Handlers.Persons;
 
-public class DeletePersonHandler : ICommandHandler<DeletePersonCommand, bool>
+public class DeletePersonHandler : IRequestHandler<DeletePersonCommand, bool>
 {
     private readonly IPersonService _service;
 
@@ -13,7 +13,7 @@ public class DeletePersonHandler : ICommandHandler<DeletePersonCommand, bool>
         _service = service;
     }
 
-    public async Task<bool> HandleAsync(DeletePersonCommand command)
+    public async Task<bool> Handle(DeletePersonCommand command)
     {
         return await _service.DeleteAsync(command.Id);
     }

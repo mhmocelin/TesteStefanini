@@ -1,9 +1,10 @@
 ﻿using Register.Application.DTOs;
-using static Register.Application.Dispatcher.IQuery;
+using Register.Application.Dispatcher;
+using Register.Application.Dispatcher.Interfaces;
 
 namespace Register.Application.Queries.Persons;
 
-public class GetPersonByIdQuery : IQuery<PersonResponse?>
+public class GetPersonByIdQuery : IRequest<PersonResponse?>
 {
     public Guid Id { get; }
 

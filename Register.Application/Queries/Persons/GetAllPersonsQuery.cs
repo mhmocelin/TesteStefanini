@@ -1,8 +1,9 @@
-﻿using Register.Application.DTOs;
-using static Register.Application.Dispatcher.IQuery;
+﻿using Register.Application.Dispatcher;
+using Register.Application.Dispatcher.Interfaces;
+using Register.Application.DTOs;
 
 namespace Register.Application.Queries.Persons;
 
-public class GetAllPersonsQuery : IQuery<IEnumerable<PersonResponse>>
+public class GetAllPersonsQuery : IRequest<IEnumerable<PersonResponse>>                                  
 {
 }

@@ -1,9 +1,9 @@
-﻿using Register.Application.DTOs;
-using static Register.Application.Dispatcher.ICommand;
+﻿using Register.Application.Dispatcher.Interfaces;
+using Register.Application.DTOs;
 
 namespace Register.Application.Commands.Persons;
 
-public class CreatePersonCommand : ICommand<PersonResponse>
+public class CreatePersonCommand : IRequest<PersonResponse>
 {
     public PersonCreate Person { get; }
 
