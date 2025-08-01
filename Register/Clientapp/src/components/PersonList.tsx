@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Person } from '../types/Person';
 import { getPersons, deletePerson } from '../services/personService';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
@@ -7,13 +7,21 @@ interface PersonListProps {
   onEdit: (person: Person) => void;
 }
 
-const PersonList: React.FC<PersonListProps> = ({ onEdit }) => {
+export interface PersonListHandles {
+  loadPersons: () => void;
+}
+
+const PersonList = forwardRef<PersonListHandles, PersonListProps>(({ onEdit }, ref) => {
   const [persons, setPersons] = useState<Person[]>([]);
 
   const loadPersons = async () => {
     const data = await getPersons();
     setPersons(data);
   };
+
+  useImperativeHandle(ref, () => ({
+    loadPersons,
+  }));
 
   const handleDelete = async (id: string) => {
     await deletePerson(id);
@@ -43,7 +51,7 @@ const PersonList: React.FC<PersonListProps> = ({ onEdit }) => {
               <TableCell>{p.email}</TableCell>
               <TableCell>{p.cpf}</TableCell>
               <TableCell>{new Date(p.birthDate).toLocaleDateString()}</TableCell>
-              <TableCell>
+              <TableCell align="center">
                 <Button variant="outlined" color="primary" onClick={() => onEdit(p)}>
                   Editar
                 </Button>
@@ -62,6 +70,6 @@ const PersonList: React.FC<PersonListProps> = ({ onEdit }) => {
       </Table>
     </TableContainer>
   );
-};
+});
 
 export default PersonList;

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Tabs, Tab, Box, Typography } from '@mui/material';
 import PersonForm from '../components/PersonForm';
-import PersonList from '../components/PersonList';
+import PersonList, { PersonListHandles } from '../components/PersonList';
 import PersonFormV2 from '../components/V2/PersonFormV2';
-import PersonListV2 from '../components/V2/PersonListV2';
+import PersonListV2, { PersonListV2Handles } from '../components/V2/PersonListV2';
 import { Person } from '../types/Person';
 import { PersonV2 } from '../types/V2/PersonV2';
 
@@ -13,8 +13,21 @@ const HomePage: React.FC = () => {
   const [selectedPersonV1, setSelectedPersonV1] = useState<Person | undefined>();
   const [selectedPersonV2, setSelectedPersonV2] = useState<PersonV2 | undefined>();
 
+  const personListV1Ref = useRef<PersonListHandles>(null);
+  const personListV2Ref = useRef<PersonListV2Handles>(null);
+
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
+  };
+
+  const handleSavedV1 = () => {
+    setSelectedPersonV1(undefined);
+    personListV1Ref.current?.loadPersons();
+  };
+
+  const handleSavedV2 = () => {
+    setSelectedPersonV2(undefined);
+    personListV2Ref.current?.loadPersonsV2();
   };
 
   return (
@@ -30,18 +43,24 @@ const HomePage: React.FC = () => {
         <Box mt={3}>
           <PersonForm
             selectedPerson={selectedPersonV1}
-            onSaved={() => setSelectedPersonV1(undefined)}
+            onSaved={handleSavedV1}
           />
-          <PersonList onEdit={(person) => setSelectedPersonV1(person)} />
+          <PersonList
+            ref={personListV1Ref}
+            onEdit={(person) => setSelectedPersonV1(person)}
+          />
         </Box>
       )}
       {tab === 1 && (
         <Box mt={3}>
           <PersonFormV2
             selectedPerson={selectedPersonV2}
-            onSaved={() => setSelectedPersonV2(undefined)}
+            onSaved={handleSavedV2}
           />
-          <PersonListV2 onEdit={(person) => setSelectedPersonV2(person)} />
+          <PersonListV2
+            ref={personListV2Ref}
+            onEdit={(person) => setSelectedPersonV2(person)}
+          />
         </Box>
       )}
     </Box>
