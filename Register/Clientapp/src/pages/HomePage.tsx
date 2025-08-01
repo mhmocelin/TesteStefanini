@@ -10,7 +10,6 @@ import { PersonV2 } from '../types/V2/PersonV2';
 const HomePage: React.FC = () => {
   const [tab, setTab] = useState(0);
 
-  // Estados para edição V1 e V2
   const [selectedPersonV1, setSelectedPersonV1] = useState<Person | undefined>();
   const [selectedPersonV2, setSelectedPersonV2] = useState<PersonV2 | undefined>();
 
@@ -27,8 +26,6 @@ const HomePage: React.FC = () => {
         <Tab label="Versão 1" />
         <Tab label="Versão 2" />
       </Tabs>
-
-      {/* Aba Versão 1 */}
       {tab === 0 && (
         <Box mt={3}>
           <PersonForm
@@ -38,8 +35,6 @@ const HomePage: React.FC = () => {
           <PersonList onEdit={(person) => setSelectedPersonV1(person)} />
         </Box>
       )}
-
-      {/* Aba Versão 2 */}
       {tab === 1 && (
         <Box mt={3}>
           <PersonFormV2

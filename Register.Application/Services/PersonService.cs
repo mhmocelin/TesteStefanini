@@ -226,7 +226,7 @@ public class PersonService : IPersonService
                 personDto.Address.Country
             );
         }
-
+        _context.Update(person);
         await _context.SaveChangesAsync();
         return PersonV2Response.FromEntity(person);
     }
